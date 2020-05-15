@@ -38,25 +38,22 @@ let DataElement = class DataElement extends LitElement {
         this.getAllData().then(() => {
             //then set the time for the Last Updated...
             this.findTheTime();
-            //Make the data useful...
-            //Now, I could use underscore or javascript object manipulation 
-            //(underscore: _.pick() or _.filter would be good), but that almost feels like
-            //cheating, so I'd rather write some logic...
+            //Make the data useful...Showing TWO ways to do it: 
+            // writing logic (helper function pickOverDataSet)
+            // and using a built in filter() function (which kinda feels like cheating)
+            // SET this.events to TEMPARRAY or TEMPARRAY2 at the end to test either method
             //pick over our data so we only have what we want
             let tempArray = [];
             this.pickOverDataSet(this.iaData, tempArray);
             this.pickOverDataSet(this.mnData, tempArray);
             //OR we could do it like this using the filter method:
-            let underscoreArray1 = this.iaData.filter(obj => obj.priority > 4 &&
-                obj.priority < 8 &&
-                obj.geometry.type.toLowerCase() == 'point');
-            let underscoreArray2 = this.mnData.filter(obj => obj.priority > 4 &&
-                obj.priority < 8 &&
-                obj.geometry.type.toLowerCase() == 'point');
+            let underscoreArray1 = this.iaData.filter(obj => obj.geometry.type.toLowerCase() == 'point');
+            let underscoreArray2 = this.mnData.filter(obj => obj.geometry.type.toLowerCase() == 'point');
             let tempArray2 = underscoreArray1.concat(underscoreArray2);
             console.log('filtered: ' + tempArray2.length + ' unfiltered: ' + tempArray.length + ' <--should be the same');
             //Finally - set our stripped data array to global events variable
-            this.events = tempArray; //test against tempArray2 if you'd like
+            this.events = tempArray; //you may change this to tempArray2 if you'd like to test
+            //the filter() method instead
             this.spinnerStatus = "";
         });
     }
@@ -70,9 +67,7 @@ let DataElement = class DataElement extends LitElement {
      */
     pickOverDataSet(dataSet, temporaryArray) {
         for (let i = 0; i < dataSet.length; i++) {
-            if (dataSet[i].priority > 4 &&
-                dataSet[i].priority < 8 &&
-                dataSet[i].geometry.type.toLowerCase() == 'point') {
+            if (dataSet[i].geometry.type.toLowerCase() == 'point') {
                 //create one stripped down object 
                 const tempObj = {
                     key: dataSet[i].key,
@@ -144,11 +139,11 @@ let DataElement = class DataElement extends LitElement {
     * @return: promise after second rest call is complete
     **/
     async getAllData() {
-        await fetch(`https://iatg.carsprogram.org/events_v1/api/eventMapFeatures`)
+        await fetch(`https://iatg.carsprogram.org:443/events_v1/api/eventMapFeatures?eventClassifications=iowaAppRoadwork&minPriority=5&maxPriority=7`)
             .then(response => response.json())
             .then(async (data) => {
             this.iaData = data;
-            return fetch(`https://mntg.carsprogram.org/events_v1/api/eventMapFeatures`)
+            return fetch(`https://mntg.carsprogram.org:443/events_v1/api/eventMapFeatures?eventClassifications=roadReports&minPriority=5&maxPriority=7`)
                 .then(response2 => response2.json())
                 .then(async (data2) => {
                 this.mnData = data2;
