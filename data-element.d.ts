@@ -22,6 +22,15 @@ export declare class DataElement extends LitElement {
      **/
     getTheDataAndMakeItUseful(): void;
     /**
+     * Void Function pickOverDataSet
+     * Helper function to give us only what we want to display
+     * (see requirements)
+     *
+     * @param dataSet: large array of json objects returned from api call
+     * @param temporaryArray: an array to hold the picked over objects
+     */
+    pickOverDataSet(dataSet: any, temporaryArray: any): void;
+    /**
      * FUNCTION findTheTime
      * set the time (this.time), adjust for AM/PM (this.tod)
      * and make leading zeros so it doesn't look wierd.
